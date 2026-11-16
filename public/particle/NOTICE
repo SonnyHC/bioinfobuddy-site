@@ -1,0 +1,43 @@
+Particle Sculpture Skill
+Copyright (C) 2026 LIghtJUNction
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+Derived from TokenNotIncluded/api.lmm.best:
+https://github.com/TokenNotIncluded/api.lmm.best
+Source revision: 8da4f3994299b7120c44b3fa579db35449a42188
+
+assets/runtime/geometry.js preserves the original geometry implementation
+from apps/web/src/features/home/sculptures/geometry.ts (TypeScript types removed).
+assets/runtime/renderer.js adapts the pixel rasterizer, depth buffer,
+point brush, transition scatter, palette and critically damped recovery from
+apps/web/src/features/home/home-poster.ts.
+assets/runtime/motion.js adapts the single-loop lifecycle and passive
+pointer/touch handling from apps/web/src/features/home/home-motion.ts.
+SKILL.md and references adapt the modelling guidance from
+.agents/skills/home-sculpture/SKILL.md and sculptures/README.md.
+Those source files identify LIghtJUNction as their 2026 copyright holder.
+The source repository also includes Copyright (C) 2023-2026 QuantumNous.
+All original notices and the GNU AGPL-3.0-or-later license are retained.
+
+The apple and bird are new procedural, stylized models. They are not scans,
+brand logos, imported photographs, measured anatomy, or species identification.
+
+The 2026-10-22 style iteration studies the composition, semantic themes and
+native-scroll scene control of TokenNotIncluded/hireferry at revision
+4393a467aa91ed0124c6fcbba5e9734ced75e55e. See references/hireferry.md for
+source links and the distinction between design reference and runtime support.
+The style studio's models and palettes are new authored examples.
+
+BioInfoBuddy smooth molecular renderer also uses Three.js 0.187.0.
+Copyright © 2010-2026 three.js authors; MIT license.
+The full MIT license is served at /particle/THREE-LICENSE.
+Source: https://github.com/mrdoob/three.js
+
+BioInfoBuddy 发布页
+首页将上述运行时改编为双螺旋 DNA、折叠蛋白和交互粒子画笔。对应源文件位于
+src/particle/ 与 src/particle/runtime/；发布页源码包同时包含构建入口、依赖锁文件和本说明。
+访问 /particle/release-site-source.zip 可下载当前发布页源码。
+原运行时许可全文位于 /particle/LICENSE。
+React、React DOM、Scheduler、Lucide React 和 Three.js 的许可分别位于
+/licenses/react.txt、/licenses/react-dom.txt、/licenses/scheduler.txt、
+/licenses/lucide-react.txt 和 /particle/THREE-LICENSE。

@@ -1,0 +1,122 @@
+/* Copyright (C) 2026 LIghtJUNction; SPDX-License-Identifier: AGPL-3.0-or-later */
+import { createRenderer } from './renderer.js';
+
+/** Own exactly one RAF. Pointer coordinates and velocity are in CSS pixels. */
+export function mountSculpture(canvas, timeline, { onFrame = () => {}, onState = () => {}, render: renderOptions = {}, rendererFactory = createRenderer } = {}) {
+  const renderer = rendererFactory(canvas, timeline, undefined, renderOptions);
+  if (!renderer) { onState('unsupported'); return null; }
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const fine = matchMedia('(hover: hover) and (pointer: fine)');
+  const pointer = { x: 0, y: 0, previousX: 0, previousY: 0, vx: 0, vy: 0, active: false };
+  let target = { x: 0, y: 0, active: false };
+  let frame = null, disposed = false, visible = true, contextLost = false, dirty = true;
+  let paused = navigator.connection?.saveData === true, last = 0, time = 0, selected = null, position = null;
+  const state = () => reduced.matches ? 'reduced' : paused ? 'paused' : 'playing';
+  let announced;
+  const announce = () => {
+    const current = state();
+    if (current !== announced) { announced = current; onState(current); }
+  };
+  const schedule = () => {
+    if (frame === null && !disposed && !contextLost && visible && !document.hidden) frame = requestAnimationFrame(render);
+  };
+  const refresh = () => { renderer.invalidateTheme(); dirty = true; schedule(); };
+  const resetClock = () => {
+    if (frame !== null) cancelAnimationFrame(frame);
+    frame = null; last = 0; target.active = false;
+    if (reduced.matches) timeline.snap?.(time);
+    announce(); refresh();
+  };
+  function render(now) {
+    frame = null;
+    if (disposed || contextLost || document.hidden || !visible) return;
+    announce();
+    const budget = fine.matches && innerWidth > 900 ? 1000 / 60 : 1000 / 30;
+    const elapsed = last ? Math.min(80, now - last) : budget;
+    if (!dirty && elapsed + 0.5 < budget) { schedule(); return; }
+    last = now;
+    const animate = !paused && !reduced.matches;
+    const dt = elapsed / 1000;
+    if (animate) time += dt;
+    pointer.previousX = pointer.x; pointer.previousY = pointer.y;
+    pointer.x += (target.x - pointer.x) * (1 - Math.exp(-elapsed / 45));
+    pointer.y += (target.y - pointer.y) * (1 - Math.exp(-elapsed / 45));
+    const vx = Math.max(-1600, Math.min(1600, (pointer.x - pointer.previousX) / Math.max(dt, .001)));
+    const vy = Math.max(-1600, Math.min(1600, (pointer.y - pointer.previousY) / Math.max(dt, .001)));
+    pointer.vx += (vx - pointer.vx) * (1 - Math.exp(-elapsed / 75));
+    pointer.vy += (vy - pointer.vy) * (1 - Math.exp(-elapsed / 75));
+    pointer.active = target.active && animate;
+    const chapter = reduced.matches && position !== null ? Math.round(position) : position;
+    renderer.draw(time, pointer, dt, !animate, selected, chapter);
+    onFrame(renderer.inspect()); dirty = false;
+    if (animate) schedule();
+  }
+  const brush = (x, y) => {
+    if (paused || reduced.matches) return;
+    const rect = canvas.getBoundingClientRect();
+    if (!target.active) {
+      pointer.x = pointer.previousX = x - rect.left;
+      pointer.y = pointer.previousY = y - rect.top;
+      pointer.vx = pointer.vy = 0;
+    }
+    target = { x: x - rect.left, y: y - rect.top, active: true }; schedule();
+  };
+  const move = event => brush(event.clientX, event.clientY);
+  const leave = () => { target.active = false; schedule(); };
+  const loseContext = event => { event.preventDefault(); contextLost = true; resetClock(); };
+  const restoreContext = () => { contextLost = false; resetClock(); };
+  const touch = event => {
+    if (event.touches.length === 1) brush(event.touches[0].clientX, event.touches[0].clientY);
+    else leave();
+  };
+  const resize = new ResizeObserver(refresh);
+  const intersection = new IntersectionObserver(([entry]) => {
+    visible = entry.isIntersecting; resetClock();
+  });
+  const theme = new MutationObserver(refresh);
+  resize.observe(canvas); intersection.observe(canvas);
+  // Observe scoped themes as well as the root; ignore renderer-owned data attributes.
+  for (let node = canvas; node; node = node.parentElement) {
+    theme.observe(node, { attributes: true, attributeFilter: ['class', 'style', 'data-theme', 'data-palette', 'data-style'] });
+  }
+  canvas.addEventListener('pointermove', move, { passive: true });
+  canvas.addEventListener('pointerdown', move, { passive: true });
+  for (const name of ['pointerleave', 'pointercancel', 'pointerup']) canvas.addEventListener(name, leave);
+  canvas.addEventListener('touchstart', touch, { passive: true });
+  canvas.addEventListener('touchmove', touch, { passive: true });
+  canvas.addEventListener('touchend', leave, { passive: true });
+  canvas.addEventListener('touchcancel', leave, { passive: true });
+  canvas.addEventListener('webglcontextlost', loseContext);
+  canvas.addEventListener('webglcontextrestored', restoreContext);
+  document.addEventListener('visibilitychange', resetClock);
+  reduced.addEventListener('change', resetClock);
+  announce(); schedule();
+  return {
+    next() {
+      if (disposed || !timeline.next) return;
+      timeline.next(time, paused || reduced.matches);
+      selected = position = null; dirty = true; schedule();
+    },
+    select(index) { selected = index; position = null; time = 0; resetClock(); },
+    seek(value) {
+      position = Math.max(0, Math.min(timeline.scenes.length - 1, Number.isFinite(value) ? value : 0));
+      selected = null; dirty = true; schedule();
+    },
+    configure(value) { renderer.configure(value); refresh(); },
+    refresh,
+    pause(value = !paused) { paused = Boolean(value); resetClock(); },
+    inspect() { return { ...renderer.inspect(), state: state(), visible, selected, position }; },
+    dispose() {
+      disposed = true; if (frame !== null) cancelAnimationFrame(frame);
+      resize.disconnect(); intersection.disconnect(); theme.disconnect();
+      canvas.removeEventListener('pointermove', move); canvas.removeEventListener('pointerdown', move);
+      for (const name of ['pointerleave', 'pointercancel', 'pointerup']) canvas.removeEventListener(name, leave);
+      canvas.removeEventListener('touchstart', touch); canvas.removeEventListener('touchmove', touch);
+      canvas.removeEventListener('touchend', leave); canvas.removeEventListener('touchcancel', leave);
+      canvas.removeEventListener('webglcontextlost', loseContext);
+      canvas.removeEventListener('webglcontextrestored', restoreContext);
+      document.removeEventListener('visibilitychange', resetClock);
+      reduced.removeEventListener('change', resetClock); renderer.dispose();
+    },
+  };
+}

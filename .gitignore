@@ -1,0 +1,9 @@
+node_modules/
+dist/
+public/particle/release-site-source.zip
+.env
+.env.*
+.DS_Store
+public/downloads/**/*.dmg
+public/downloads/**/*.exe
+public/downloads/.staging-*/

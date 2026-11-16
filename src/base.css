@@ -1,0 +1,21 @@
+:root {
+  --brand-ground: #fafbfe;
+  --brand-ink: #20304b;
+  --brand-muted: #67738b;
+  --brand-line: #e0e5f0;
+  --brand-accent: #4f46d6;
+  background: var(--brand-ground);
+  font: 400 13px/1.55 -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body, h1, h2, h3, p { margin: 0; }
+button, input, select { font: inherit; }
+button { background: none; border: 0; color: inherit; cursor: pointer; }
+button:disabled { opacity: .48; cursor: not-allowed; }
+button, input, select { border-radius: 10px; }
+a { color: inherit; text-decoration: none; }
+svg { flex-shrink: 0; }
+summary:focus-visible { outline: 2px solid var(--launch-accent); outline-offset: 4px; }
+input[type='checkbox'] { width: 14px; height: 14px; margin: 0; accent-color: var(--launch-accent); }

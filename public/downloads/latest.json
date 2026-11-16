@@ -1,0 +1,15 @@
+{
+  "version": "0.3.0",
+  "assets": {
+    "macos": {
+      "name": "BioInfoBuddy-0.3.0-macOS-arm64.dmg",
+      "bytes": 475403575,
+      "sha256": "193725617cb44d7429a0d6ff101efd66925fba4d0a856662b2d935771f6ee57e"
+    },
+    "windows": {
+      "name": "BioInfoBuddy-0.3.0-Windows-x64-Setup.exe",
+      "bytes": 503189903,
+      "sha256": "e89f7468dd44c74a771c56c1cf5824d3579421e6d6cf78df04ff405251d06e7d"
+    }
+  }
+}
