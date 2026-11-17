@@ -1,49 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ArrowDownToLine, ArrowUpRight, ChevronDown, Globe2 } from 'lucide-react';
+import { Archive, ArrowDownToLine, ArrowUpRight, ChevronDown, Globe2 } from 'lucide-react';
 
-const platforms = [
-  { id: 'macos', label: 'macOS', systems: 'macOS 13+ · Apple 芯片' },
-  { id: 'windows', label: 'Windows', systems: 'Windows 10 / 11 · x64' },
-] as const;
-
-type Platform = (typeof platforms)[number]['id'];
-interface Asset {
-  name: string;
-  bytes: number;
-  sha256: string;
-}
-interface Release {
-  version: string;
-  assets: Record<Platform, Asset>;
-}
-
-function isRelease(value: unknown): value is Release {
-  if (!value || typeof value !== 'object' || !('version' in value) || !('assets' in value))
-    return false;
-  const { version, assets } = value;
-  if (
-    typeof version !== 'string' ||
-    !/^\d+\.\d+\.\d+$/.test(version) ||
-    !assets ||
-    typeof assets !== 'object'
-  )
-    return false;
-  const expected = {
-    macos: `BioInfoBuddy-${version}-macOS-arm64.dmg`,
-    windows: `BioInfoBuddy-${version}-Windows-x64-Setup.exe`,
-  };
-  return platforms.every(({ id }) => {
-    const asset = (assets as Record<string, Partial<Asset>>)[id];
-    return (
-      asset?.name === expected[id] &&
-      typeof asset.bytes === 'number' &&
-      Number.isSafeInteger(asset.bytes) &&
-      asset.bytes > 0 &&
-      typeof asset.sha256 === 'string' &&
-      /^[a-f0-9]{64}$/.test(asset.sha256)
-    );
-  });
-}
+import { platforms, readRelease, type Release } from './desktop-release';
 
 export default function DesktopDownloads({ webUrl }: { webUrl?: string }) {
   const [release, setRelease] = useState<Release | null>(null);
@@ -57,8 +15,7 @@ export default function DesktopDownloads({ webUrl }: { webUrl?: string }) {
         cache: 'no-cache',
       });
       if (!response.ok) throw new Error('release');
-      const data: unknown = await response.json();
-      if (!isRelease(data)) throw new Error('release');
+      const data = readRelease(await response.json(), window.location.href);
       if (!controller.signal.aborted) setRelease(data);
     })().catch(() => {
       if (!controller.signal.aborted) setFailed(true);
@@ -93,38 +50,67 @@ export default function DesktopDownloads({ webUrl }: { webUrl?: string }) {
       </div>
     );
 
+  const { installers, zip } = release;
+  const zipLink = zip && (
+    <a className={installers ? 'web-link' : 'release-download'} href={zip.href} download={zip.name}>
+      <Archive size={16} aria-hidden="true" />
+      <span>下载双平台 ZIP</span>
+      {!installers && <ArrowDownToLine size={18} aria-hidden="true" />}
+    </a>
+  );
+  const checksums: { label: string; hash: string }[] = installers
+    ? platforms.map(({ id, label }) => ({ label, hash: installers[id].sha256 }))
+    : [];
+  if (zip?.metadata) checksums.push({ label: 'ZIP', hash: zip.metadata.sha256 });
+
   return (
     <section className="release-downloads" aria-label="桌面版下载">
       <div className="release-version">
         桌面版 <span>v{release.version}</span>
       </div>
-      <div className="release-platforms">
-        {platforms.map(({ id, label, systems }) => {
-          const asset = release.assets[id];
-          return (
-            <div className="release-platform" key={id}>
-              <a
-                className="release-download"
-                href={`/downloads/${release.version}/${asset.name}`}
-                download={asset.name}
-              >
-                <span>下载 {label} 版</span>
-                <ArrowDownToLine size={18} aria-hidden="true" />
-              </a>
-              <small>
-                {systems} · {Math.round(asset.bytes / 1_000_000)} MB
-              </small>
-            </div>
-          );
-        })}
-      </div>
+      {installers ? (
+        <div className="release-platforms">
+          {platforms.map(({ id, label, systems }) => {
+            const asset = installers[id];
+            return (
+              <div className="release-platform" key={id}>
+                <a
+                  className="release-download"
+                  href={`/downloads/${release.version}/${asset.name}`}
+                  download={asset.name}
+                >
+                  <span>下载 {label} 版</span>
+                  <ArrowDownToLine size={18} aria-hidden="true" />
+                </a>
+                <small>
+                  {systems} · {Math.round(asset.bytes / 1_000_000)} MB
+                </small>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="release-platform release-bundle">
+          {zipLink}
+          <small>
+            内含 macOS 和 Windows 安装包
+            {zip?.metadata && ` · ${Math.round(zip.metadata.bytes / 1_000_000)} MB`}
+          </small>
+        </div>
+      )}
       <div className="secondary-actions">
         {webLink}
+        {installers && zipLink}
         <details className="release-help">
           <summary>
-            安装说明与文件校验
+            {checksums.length ? '安装说明与文件校验' : '安装说明'}
             <ChevronDown size={14} aria-hidden="true" />
           </summary>
+          {zip && (
+            <p>
+              <strong>ZIP</strong> 解压后，在版本目录中选择自己系统的安装包。
+            </p>
+          )}
           <p>
             <strong>macOS</strong> 打开 DMG，将 BioInfoBuddy 拖入「应用程序」。
           </p>
@@ -132,11 +118,11 @@ export default function DesktopDownloads({ webUrl }: { webUrl?: string }) {
             <strong>Windows</strong> 双击 Setup.exe，按向导完成安装。
           </p>
           <dl>
-            {platforms.map(({ id, label }) => (
-              <div key={id}>
+            {checksums.map(({ label, hash }) => (
+              <div key={label}>
                 <dt>{label} SHA-256</dt>
                 <dd>
-                  <code>{release.assets[id].sha256}</code>
+                  <code>{hash}</code>
                 </dd>
               </div>
             ))}

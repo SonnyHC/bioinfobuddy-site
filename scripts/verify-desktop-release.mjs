@@ -11,6 +11,7 @@ const names = {
   macos: `BioInfoBuddy-${version}-macOS-arm64.dmg`,
   windows: `BioInfoBuddy-${version}-Windows-x64-Setup.exe`,
 };
+if (assets?.zip) names.zip = `BioInfoBuddy-${version}.zip`;
 for (const [platform, name] of Object.entries(names)) {
   const asset = assets?.[platform];
   if (asset?.name !== name || !Number.isSafeInteger(asset.bytes) || asset.bytes < 1 || !/^[a-f0-9]{64}$/.test(asset.sha256)) {

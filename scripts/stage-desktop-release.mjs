@@ -1,12 +1,13 @@
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { copyFile, mkdir, mkdtemp, open, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
+import { copyFile, link, mkdir, mkdtemp, open, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { describeDesktopZip } from './describe-desktop-zip.mjs';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const sourceArg = process.argv[2];
-if (!sourceArg) throw new Error('Usage: npm run stage:release -- INSTALLER_DIR [VERSION]');
+if (!sourceArg) throw new Error('Usage: npm run stage:release -- INSTALLER_DIR [VERSION] [ZIP_FILE]');
 const source = path.resolve(sourceArg);
 const target = path.join(root, 'public/downloads');
 const versions = new Set((await readdir(source)).flatMap(name => {
@@ -45,18 +46,50 @@ try {
     await copyFile(path.join(source, name), stagedFile);
     assets[platform] = await describe(stagedFile, platform);
   }
-  // Publish both artifacts before exposing their manifest. Keep existing version URLs immutable.
-  const destination = path.join(target, version);
-  const existing = await stat(destination).catch(e => { if (e.code !== 'ENOENT') throw e; });
-  if (existing) {
-    for (const [platform, asset] of Object.entries(assets)) {
-      const current = await describe(path.join(destination, asset.name), platform);
-      if (current.sha256 !== asset.sha256) throw new Error(`Version ${version} already has different installers at ${target}. Use a new version or an empty staging directory.`);
-    }
-  } else {
-    await rename(stage, destination);
+  const zipName = `BioInfoBuddy-${version}.zip`;
+  const zipSource = process.argv[4] ? path.resolve(process.argv[4]) : path.join(source, zipName);
+  const stagedZip = path.join(stage, zipName);
+  let hasNewZip = true;
+  try {
+    await copyFile(zipSource, stagedZip);
+  } catch (error) {
+    if (process.argv[4] || error.code !== 'ENOENT') throw error;
+    hasNewZip = false;
   }
-  const manifest = JSON.stringify({ version, assets }, null, 2) + '\n';
+  if (hasNewZip) assets.zip = await describeDesktopZip(stagedZip, version, assets);
+
+  const destination = path.join(target, version);
+  try {
+    await rename(stage, destination);
+  } catch (error) {
+    if (!['EEXIST', 'ENOTEMPTY'].includes(error.code)) throw error;
+    for (const platform of Object.keys(names)) {
+      const asset = assets[platform];
+      const current = await describe(path.join(destination, asset.name), platform);
+      if (current.sha256 !== asset.sha256) throw new Error(`Version ${version} already contains a different ${platform} installer.`);
+    }
+    // Add a ZIP to an existing immutable release without replacing an existing file.
+    const publishedZip = path.join(destination, zipName);
+    let verifyExistingZip = !hasNewZip;
+    if (hasNewZip) {
+      try { await link(stagedZip, publishedZip); }
+      catch (error) { if (error.code !== 'EEXIST') throw error; verifyExistingZip = true; }
+    }
+    if (verifyExistingZip) {
+      const installers = { macos: assets.macos, windows: assets.windows };
+      const existing = await describeDesktopZip(publishedZip, version, installers).catch(error => {
+        if (error.code !== 'ENOENT' || hasNewZip) throw error;
+      });
+      if (hasNewZip && existing.sha256 !== assets.zip.sha256) throw new Error(`Version ${version} already contains a different ZIP.`);
+      if (existing) assets.zip = existing;
+    }
+  }
+  const previous = await readFile(path.join(target, 'latest.json'), 'utf8').catch(error => {
+    if (error.code !== 'ENOENT') throw error;
+  });
+  const current = previous ? JSON.parse(previous) : null;
+  const zipUrl = current?.version === version ? current.zipUrl ?? '' : '';
+  const manifest = JSON.stringify({ version, zipUrl, assets }, null, 2) + '\n';
   const temp = path.join(target, `.latest-${process.pid}.json`);
   await writeFile(temp, manifest);
   await rename(temp, path.join(target, 'latest.json'));
