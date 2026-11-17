@@ -119,10 +119,10 @@
 }
 .launch-cta {
   display: flex;
-  align-items: center;
-  gap: 24px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
   margin-top: 34px;
-  flex-wrap: wrap;
 }
 .launch-primary {
   display: inline-flex;
@@ -449,9 +449,6 @@
   .launch-header {
     gap: 12px;
   }
-  .launch-cta {
-    gap: 10px;
-  }
   .launch-primary {
     gap: 18px;
     padding: 14px 16px;
@@ -459,10 +456,10 @@
 }
 
 .launch-installers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  width: min(100%, 309px);
 }
 .launch-download {
   white-space: nowrap;
@@ -483,30 +480,20 @@
   border-color: var(--launch-accent);
   color: var(--launch-accent);
 }
-.launch-download[data-platform='macos'] {
-  --installer-fill: #363b49;
-  --installer-hover: #242936;
+.launch-installers .launch-download {
+  background-color: #315c69;
+  border-color: #315c69;
+  color: #fff;
+  font-weight: 550;
+  gap: 9px;
+  padding-inline: 6px;
 }
-.launch-download[data-platform='windows'] {
-  --installer-fill: #0668b4;
-  --installer-hover: #055491;
+.launch-installers a.launch-download:hover {
+  background-color: #264c58;
+  border-color: #264c58;
 }
-.launch[data-theme='dark'] .launch-download[data-platform='macos'] {
-  --installer-fill: #d6dae3;
-  --installer-hover: #e6e9ef;
-}
-.launch[data-theme='dark'] .launch-download[data-platform='windows'] {
-  --installer-fill: #84c6ff;
-  --installer-hover: #a5d5ff;
-}
-.launch-download[data-platform] {
-  background-color: var(--installer-fill);
-  border-color: var(--installer-fill);
-  color: var(--launch-button-ink);
-}
-a.launch-download[data-platform]:hover {
-  background-color: var(--installer-hover);
-  border-color: var(--installer-hover);
+.launch[data-theme='dark'] .launch-installers .launch-download {
+  border-color: #648994;
 }
 @media (max-width: 760px) {
   .launch-download {
@@ -514,8 +501,8 @@ a.launch-download[data-platform]:hover {
   }
 }
 @media (max-width: 380px) {
-  .launch-download {
-    gap: 6px;
-    padding-inline: 10px;
+  .launch-installers .launch-download {
+    gap: 5px;
+    padding-inline: 3px;
   }
 }
