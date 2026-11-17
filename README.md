@@ -1,6 +1,6 @@
 # BioInfoBuddy 发布页
 
-官网沿用 BioInfoBuddy 的启动页，提供 macOS 和 Windows 桌面版下载。此仓库维护页面源码和 `public/downloads/latest.json` 版本清单。两份安装包单独交付给网站维护者。
+官网以可交互的 DNA 双螺旋和蛋白质粒子场景开场，提供 macOS 和 Windows 桌面版下载。此仓库维护页面源码和 `public/downloads/latest.json` 版本清单。两份安装包单独交付给网站维护者。
 
 ## 本地预览
 
@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-`npm run build` 将静态页面输出到 `dist/`。`npm run preview` 用于查看构建结果。若另有线上网页版工作台，可在构建时设置 `VITE_WORKBENCH_URL`。
+`npm run build` 将静态页面输出到 `dist/`。`npm run preview` 用于查看构建结果。本地预览入口为 `/`。下载按钮下方提供“打开网页版”，默认指向 `https://bioinfobuddy.com.cn/?view=chat`。工作台迁移时可在构建前设置 `VITE_WORKBENCH_URL`。
 
 ## 安装包交付
 
