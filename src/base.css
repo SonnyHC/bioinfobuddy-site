@@ -1,6 +1,10 @@
 :root {
-  background: #080c1b;
-  color-scheme: dark;
+  --brand-ground: #fafbfe;
+  --brand-ink: #20304b;
+  --brand-muted: #67738b;
+  --brand-line: #e0e5f0;
+  --brand-accent: #4f46d6;
+  background: var(--brand-ground);
   font:
     400 13px/1.55 -apple-system,
     BlinkMacSystemFont,
@@ -49,12 +53,12 @@ svg {
   flex-shrink: 0;
 }
 summary:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--launch-accent);
   outline-offset: 4px;
 }
 input[type='checkbox'] {
   width: 14px;
   height: 14px;
   margin: 0;
-  accent-color: var(--accent);
+  accent-color: var(--launch-accent);
 }
