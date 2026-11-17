@@ -66,7 +66,7 @@ export default function DesktopDownloads({ webUrl }: { webUrl?: string }) {
   return (
     <section className="release-downloads" aria-label="桌面版下载">
       <div className="release-version">
-        桌面版 <span>v{release.version}</span>
+        当前版本 <span>{release.version}</span>
       </div>
       {installers ? (
         <div className="release-platforms">

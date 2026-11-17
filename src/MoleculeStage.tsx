@@ -42,6 +42,17 @@ export default function MoleculeStage() {
   }, [settings]);
   const disabled = state === 'loading' || state === 'unsupported';
   const name = scene === 'double-helix' ? 'DNA 双螺旋' : '蛋白质折叠';
+  const label = scene === 'double-helix' ? '01 / DNA DOUBLE HELIX' : '02 / PROTEIN FOLD';
+  const switchLabel =
+    scene === 'double-helix'
+      ? 'DNA 双螺旋粒子造型，点击切换为蛋白质'
+      : '蛋白质粒子造型，点击切换为 DNA 双螺旋';
+  const status: Record<string, string> = {
+    reduced: '减少动态效果 · 点击切换静态造型',
+    paused: '已暂停 · 点击切换静态造型',
+    loading: '正在构建粒子造型…',
+    unsupported: '生命的形状 · 静态示意',
+  };
   return (
     <figure className="molecule-stage">
       <div className="molecular-field">
@@ -52,7 +63,8 @@ export default function MoleculeStage() {
             ref={canvas}
             tabIndex={disabled ? -1 : 0}
             role="button"
-            aria-label={`${name}，点击切换造型`}
+            aria-label={switchLabel}
+            aria-describedby="particle-interaction"
             aria-disabled={disabled}
             onKeyDown={(e) => {
               if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
@@ -60,11 +72,16 @@ export default function MoleculeStage() {
                 if (!e.repeat) owner.current?.next();
               }
             }}
-          />
+          >
+            粒子构成的 DNA 双螺旋与蛋白质三维造型。点击或按 Enter、空格键切换造型。
+          </canvas>
         </div>
         {state === 'unsupported' && (
           <div className="molecule-fallback">
-            <Dna size={128} strokeWidth={1} />
+            <div>
+              <Dna size={128} strokeWidth={1} />
+              <p>从生命的线索，开始探索。</p>
+            </div>
           </div>
         )}
       </div>
@@ -72,7 +89,7 @@ export default function MoleculeStage() {
         <span className="molecule-name">
           <i />
           {name}
-          <small>{scene === 'double-helix' ? 'DOUBLE HELIX' : 'PROTEIN FOLD'}</small>
+          <small>{label}</small>
         </span>
         <span className="motion-actions">
           <button
@@ -95,6 +112,9 @@ export default function MoleculeStage() {
             <SlidersHorizontal size={16} />
           </button>
         </span>
+        <span className="particle-interaction" id="particle-interaction">
+          {status[state]}
+        </span>
       </figcaption>
       <dialog
         ref={dialog}
@@ -104,22 +124,30 @@ export default function MoleculeStage() {
       >
         <header>
           <h2 id="scene-settings">造型显示</h2>
-          <button aria-label="关闭设置" onClick={() => setSettings(false)}>
+          <button aria-label="关闭显示设置" onClick={() => setSettings(false)}>
             <X size={18} />
           </button>
         </header>
+        <p>选择你喜欢的观看方式。</p>
         <label>
           镜头
           <select value={projection} onChange={(e) => setProjection(e.target.value)}>
-            <option value="perspective">透视</option>
-            <option value="orthographic">正交</option>
+            <option value="perspective">固定透视 · 呈现纵深</option>
+            <option value="orthographic">正交视角 · 保持比例</option>
           </select>
         </label>
         <label>
           <span>指针互动</span>
           <input type="checkbox" checked={brush} onChange={(e) => setBrush(e.target.checked)} />
         </label>
-        <small>分子造型为艺术化示意。</small>
+        <button
+          className="static-toggle"
+          disabled={disabled || state === 'reduced'}
+          onClick={() => owner.current?.pause(state !== 'paused')}
+        >
+          {state === 'paused' ? '恢复自动动画' : '切换为静态造型'}
+        </button>
+        <small>DNA 双螺旋与蛋白质造型均为艺术化示意。</small>
       </dialog>
     </figure>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { ArrowDown, Dna } from 'lucide-react';
+import { Dna } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import DesktopDownloads from './DesktopDownloads';
@@ -58,8 +58,8 @@ export default function Launch() {
             BioInfoBuddy<span className="brand-dot">.</span>
           </a>
           <nav className="page-nav" aria-label="页内导航">
-            <a href="#cases">分析案例</a>
-            <a href="#workbench">工作台</a>
+            <a href="#cases">案例与图表</a>
+            <a href="#workbench">工作台功能</a>
           </nav>
         </div>
       </header>
@@ -67,28 +67,17 @@ export default function Launch() {
         <section className="hero" aria-labelledby="hero-title">
           <div className="hero-inner section-shell">
             <div className="hero-copy">
-              <p className="hero-eyebrow">
-                <span />
-                生物信息分析工作台
-              </p>
               <h1 id="hero-title">
-                <span>生命的线索，</span>
-                <em>藏在数据里。</em>
+                <span>让数据，</span>
+                <em>显现生命的线索。</em>
               </h1>
-              <p className="hero-intro">用中文讨论实验数据，在本机查看组学案例、图表与复现代码。</p>
               <DesktopDownloads webUrl={workbenchUrl('chat')} />
             </div>
             <MoleculeStage />
           </div>
-          <div className="hero-tail section-shell">
-            <a href="#cases">
-              <ArrowDown size={14} /> 浏览分析案例
-            </a>
-            <span>分子造型 · 交互演示</span>
-          </div>
         </section>
         <Cases caseUrl={caseUrl} />
-        <Workbench href={caseUrl} />
+        <Workbench skillsUrl={workbenchUrl('skills')} tutorialUrl={workbenchUrl('tutorial')} />
       </main>
       <footer className="section-shell">
         <span>BioInfoBuddy</span>

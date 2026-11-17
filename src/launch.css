@@ -82,6 +82,7 @@ footer a:hover {
   padding-block: clamp(46px, 6vw, 98px);
 }
 .hero-copy {
+  container-type: inline-size;
   position: relative;
   z-index: 2;
   min-width: 0;
@@ -457,7 +458,7 @@ footer a:hover {
 .section-kicker {
   margin-bottom: 10px;
 }
-.section-heading h2,
+.case-info h2,
 .work-copy h2 {
   font:
     500 clamp(32px, 3.7vw, 60px) / 1.25 'Songti SC',
@@ -495,7 +496,7 @@ footer a:hover {
   margin: 6px 0;
 }
 .case-info p,
-.work-copy > p:not(.section-kicker) {
+.work-copy > p {
   font-size: 14px;
   color: var(--muted);
   line-height: 1.85;
@@ -504,7 +505,7 @@ footer a:hover {
 .inline-action {
   margin-top: 8px;
 }
-.launch .section-heading h2,
+.launch .case-info h2,
 .launch .work-copy h2 {
   font-family: inherit;
   font-weight: 600;
@@ -524,8 +525,16 @@ footer a:hover {
   align-items: flex-start;
   justify-content: center;
 }
-.case-info h3 {
-  margin: 14px 0;
+.case-info h2 {
+  margin-bottom: 12px;
+}
+.case-info h2 a:hover,
+.work-copy h2 a:hover {
+  color: var(--accent);
+}
+.work-features {
+  display: grid;
+  gap: clamp(22px, 3vw, 44px);
 }
 .case-controls {
   display: flex;
@@ -549,7 +558,7 @@ footer a:hover {
   align-items: center;
   border-top: 1px solid var(--rule);
 }
-.work-copy > p:not(.section-kicker) {
+.work-copy > p {
   margin: 14px 0 6px;
 }
 .app-shot {
@@ -738,4 +747,40 @@ footer a:hover {
     gap: 14px;
     font-size: 12px;
   }
+}
+
+/* Keep the original title line inside the text column. */
+.launch .hero h1 {
+  font-size: min(13.2cqi, clamp(46px, 5.65vw, 94px));
+  margin-top: 0;
+}
+.molecule-stage figcaption {
+  flex-wrap: wrap;
+}
+.particle-interaction {
+  flex-basis: 100%;
+  color: var(--muted);
+  font-size: 11px;
+}
+.particle-interaction:empty {
+  display: none;
+}
+.molecule-fallback > div {
+  text-align: center;
+}
+.launch dialog > p,
+.launch dialog > small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.launch dialog > p {
+  margin-top: 8px;
+}
+.static-toggle {
+  color: var(--accent);
+  padding: 0;
+}
+.launch dialog > small {
+  display: block;
+  margin-top: 16px;
 }
