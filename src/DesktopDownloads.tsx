@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Download } from 'lucide-react';
-import { readZipDownload } from './desktop-release';
+import { platforms, readInstallers } from './desktop-release';
 
 export default function DesktopDownloads() {
-  const [zip, setZip] = useState<ReturnType<typeof readZipDownload>>();
+  const [downloads, setDownloads] = useState<ReturnType<typeof readInstallers>>();
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
@@ -15,8 +15,8 @@ export default function DesktopDownloads() {
         cache: 'no-cache',
       });
       if (!response.ok) throw new Error('Release unavailable');
-      const download = readZipDownload(await response.json(), window.location.href);
-      if (!controller.signal.aborted) setZip(download);
+      const installers = readInstallers(await response.json(), window.location.href);
+      if (!controller.signal.aborted) setDownloads(installers);
     }
     load().catch(() => {
       if (!controller.signal.aborted) setFailed(true);
@@ -24,23 +24,46 @@ export default function DesktopDownloads() {
     return () => controller.abort();
   }, [attempt]);
 
-  if (zip) {
+  if (failed) {
     return (
-      <a className="launch-download" href={zip.href} download={zip.name}>
-        <Download size={16} aria-hidden="true" /> 下载压缩包
-      </a>
+      <button
+        className="launch-download"
+        onClick={() => {
+          setFailed(false);
+          setAttempt((n) => n + 1);
+        }}
+      >
+        重新获取下载链接
+      </button>
     );
   }
+
   return (
-    <button
-      className="launch-download"
-      disabled={!failed}
-      onClick={() => {
-        setFailed(false);
-        setAttempt((n) => n + 1);
-      }}
-    >
-      <Download size={16} aria-hidden="true" /> {failed ? '重新获取下载链接' : '下载压缩包'}
-    </button>
+    <div className="launch-installers" role="group" aria-label="桌面版下载">
+      {platforms.map(({ id, label, hint }, index) => {
+        const installer = downloads?.[index];
+        const content = (
+          <>
+            <Download size={16} aria-hidden="true" />
+            {label}
+          </>
+        );
+        return installer ? (
+          <a
+            key={id}
+            className="launch-download"
+            href={installer.href}
+            download={installer.name}
+            title={hint}
+          >
+            {content}
+          </a>
+        ) : (
+          <button key={id} className="launch-download" disabled>
+            {content}
+          </button>
+        );
+      })}
+    </div>
   );
 }

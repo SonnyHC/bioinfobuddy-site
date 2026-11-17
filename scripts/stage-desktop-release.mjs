@@ -88,6 +88,12 @@ try {
     if (error.code !== 'ENOENT') throw error;
   });
   const current = previous ? JSON.parse(previous) : null;
+  if (current?.version === version) {
+    for (const platform of Object.keys(names)) {
+      const url = current.assets?.[platform]?.url;
+      if (url) assets[platform].url = url;
+    }
+  }
   const zipUrl = current?.version === version ? current.zipUrl ?? '' : '';
   const manifest = JSON.stringify({ version, zipUrl, assets }, null, 2) + '\n';
   const temp = path.join(target, `.latest-${process.pid}.json`);

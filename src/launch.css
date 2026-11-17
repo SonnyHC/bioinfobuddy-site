@@ -458,7 +458,14 @@
   }
 }
 
+.launch-installers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
+}
 .launch-download {
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -484,6 +491,6 @@
 @media (max-width: 380px) {
   .launch-download {
     gap: 6px;
-    padding-inline: 14px;
+    padding-inline: 10px;
   }
 }

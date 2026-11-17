@@ -1,12 +1,17 @@
 # BioInfoBuddy 发布页
 
-首页使用原启动页的文案、布局和粒子动画。「开始探索」进入网页版，旁边的「下载压缩包」下载包含 macOS（Apple 芯片）和 Windows（x64）安装程序的 ZIP。
+首页沿用原启动页。「开始探索」进入网页版，旁边的「下载 macOS 版」「下载 Windows 版」分别提供 Apple 芯片的 DMG 和 Windows x64 的 EXE 安装程序。
 
 ## 交付下载
 
-将 `BioInfoBuddy-0.3.0-官网安装包.zip` 原样上传到网站或对象存储，把文件直链填入 `public/downloads/latest.json` 的 `zipUrl`。已经构建好的页面可直接修改 `dist/downloads/latest.json`。
+解压交付包，将里面的两个文件按以下路径放在网站上，下载按钮即可使用。
 
-使用站内默认路径时，将 ZIP 命名为 `BioInfoBuddy-0.3.0.zip`，放到站点根目录下的 `downloads/0.3.0/`，保留仓库中的版本清单即可。
+```text
+downloads/0.3.0/BioInfoBuddy-0.3.0-macOS-arm64.dmg
+downloads/0.3.0/BioInfoBuddy-0.3.0-Windows-x64-Setup.exe
+```
+
+如果安装包放在对象存储，请在 `public/downloads/latest.json` 的 `assets.macos.url` 和 `assets.windows.url` 分别填入两个文件的 HTTPS 直链。已经构建好的站点可直接修改 `dist/downloads/latest.json`。
 
 ## 预览与构建
 
