@@ -483,6 +483,31 @@
   border-color: var(--launch-accent);
   color: var(--launch-accent);
 }
+.launch-download[data-platform='macos'] {
+  --installer-fill: #363b49;
+  --installer-hover: #242936;
+}
+.launch-download[data-platform='windows'] {
+  --installer-fill: #0668b4;
+  --installer-hover: #055491;
+}
+.launch[data-theme='dark'] .launch-download[data-platform='macos'] {
+  --installer-fill: #d6dae3;
+  --installer-hover: #e6e9ef;
+}
+.launch[data-theme='dark'] .launch-download[data-platform='windows'] {
+  --installer-fill: #84c6ff;
+  --installer-hover: #a5d5ff;
+}
+.launch-download[data-platform] {
+  background-color: var(--installer-fill);
+  border-color: var(--installer-fill);
+  color: var(--launch-button-ink);
+}
+a.launch-download[data-platform]:hover {
+  background-color: var(--installer-hover);
+  border-color: var(--installer-hover);
+}
 @media (max-width: 760px) {
   .launch-download {
     min-height: 48px;

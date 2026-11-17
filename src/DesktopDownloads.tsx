@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Download } from 'lucide-react';
 import { platforms, readInstallers } from './desktop-release';
+
+const platformIconPaths = {
+  macos:
+    'M16.5 1.8c.1 1.3-.5 2.6-1.3 3.5-.8.9-2.1 1.6-3.4 1.5-.2-1.3.5-2.6 1.3-3.5.8-.9 2.2-1.5 3.4-1.5ZM19 12.4c0-2 1.1-3.3 2.2-4.1-1.3-1.7-3.1-2.1-4.2-2.1-1.7-.1-3.2 1.1-4.2 1.1-1.1 0-2.4-1.1-4-1.1-2 0-3.9 1.2-4.9 3-2.1 3.6-.5 8.7 1.5 11.4.9 1.3 1.9 2.5 3.4 2.4 1.4 0 2-1 3.9-1s2.5 1 4 1c1.6 0 2.5-1.2 3.4-2.5 1-1.4 1.5-2.8 1.7-3.3-1.6-.7-2.8-2.3-2.8-4.8Z',
+  windows: 'M2 2h9.2v9.2H2z M12.8 2H22v9.2h-9.2z M2 12.8h9.2V22H2z M12.8 12.8H22V22h-9.2z',
+};
 
 export default function DesktopDownloads() {
   const [downloads, setDownloads] = useState<ReturnType<typeof readInstallers>>();
@@ -44,7 +49,16 @@ export default function DesktopDownloads() {
         const installer = downloads?.[index];
         const content = (
           <>
-            <Download size={16} aria-hidden="true" />
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d={platformIconPaths[id]} />
+            </svg>
             {label}
           </>
         );
@@ -52,6 +66,7 @@ export default function DesktopDownloads() {
           <a
             key={id}
             className="launch-download"
+            data-platform={id}
             href={installer.href}
             download={installer.name}
             title={hint}
@@ -59,7 +74,7 @@ export default function DesktopDownloads() {
             {content}
           </a>
         ) : (
-          <button key={id} className="launch-download" disabled>
+          <button key={id} className="launch-download" data-platform={id} disabled>
             {content}
           </button>
         );
