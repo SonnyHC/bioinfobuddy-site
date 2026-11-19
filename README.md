@@ -2,18 +2,9 @@
 
 首页沿用原启动页。「开始探索」进入网页版，旁边的「下载 macOS 版」「下载 Windows 版」分别提供 Apple 芯片的 DMG 和 Windows x64 的 EXE 安装程序。
 
-## 交付下载
+## 客户端下载
 
-0.3.1 安装包随交付 ZIP 提供，文件大小和 SHA-256 记录在 `public/downloads/0.3.1/manifest.json`。官网当前下载版本为 0.3.0。
-
-上架 0.3.1 时，解压 ZIP，将两个安装包放到网站的对应路径。核对文件后，用 0.3.1 清单更新 `public/downloads/latest.json`，两个下载按钮便会展示该版本。
-
-```text
-downloads/0.3.1/BioInfoBuddy-0.3.1-macOS-arm64.dmg
-downloads/0.3.1/BioInfoBuddy-0.3.1-Windows-x64-Setup.exe
-```
-
-如果安装包放在对象存储，请在 `public/downloads/latest.json` 的 `assets.macos.url` 和 `assets.windows.url` 分别填入两个文件的 HTTPS 直链。已经构建好的站点可直接修改 `dist/downloads/latest.json`。
+官网首页的两个下载按钮从 `public/downloads/latest.json` 读取安装包地址。版本 0.3.1 提供适用于 Apple 芯片的 macOS DMG 和 Windows x64 安装程序。两个文件的 HTTPS 地址、字节数和 SHA-256 同时记录在 `public/downloads/0.3.1/manifest.json`。
 
 ## 预览与构建
 
@@ -36,6 +27,6 @@ npm run verify:release
 npm run build
 ```
 
-脚本核对 ZIP 中的两个安装包并更新版本清单。安装包单独交付，Git 仓库保存源码和清单。
+导入脚本核对本地安装包并生成清单。发布新版本时，将已发布安装包的 HTTPS 直链填入 `assets.macos.url` 和 `assets.windows.url`，同步更新版本目录的 `manifest.json` 与 `latest.json`。
 
 页脚的「粒子引擎 · 开源说明」提供粒子动画的许可信息和发布页源码包地址。

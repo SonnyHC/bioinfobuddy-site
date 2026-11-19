@@ -1,21 +1,17 @@
 {
-  "version": "0.3.0",
-  "zipUrl": "",
+  "version": "0.3.1",
   "assets": {
     "macos": {
-      "name": "BioInfoBuddy-0.3.0-macOS-arm64.dmg",
-      "bytes": 475403575,
-      "sha256": "193725617cb44d7429a0d6ff101efd66925fba4d0a856662b2d935771f6ee57e"
+      "name": "BioInfoBuddy-0.3.1-macOS-arm64.dmg",
+      "bytes": 475478984,
+      "sha256": "70bd81b74ca2dab31c76e5d6683d98e9757dd07919bd12e7133c72ecf0322e1f",
+      "url": "https://github.com/SonnyHC/bioinfobuddy-site/releases/download/v0.3.1/BioInfoBuddy-0.3.1-macOS-arm64.dmg"
     },
     "windows": {
-      "name": "BioInfoBuddy-0.3.0-Windows-x64-Setup.exe",
-      "bytes": 503189903,
-      "sha256": "e89f7468dd44c74a771c56c1cf5824d3579421e6d6cf78df04ff405251d06e7d"
-    },
-    "zip": {
-      "name": "BioInfoBuddy-0.3.0.zip",
-      "bytes": 978594399,
-      "sha256": "911506d0277521169b39d4cb2153dead9ecfb2e4ba6e6e7f41c335d51a29b9bb"
+      "name": "BioInfoBuddy-0.3.1-Windows-x64-Setup.exe",
+      "bytes": 503211173,
+      "sha256": "5a78c6df7986a600f83c8f4c0331f3b9c0e547614a21ac616c1edc5f17958835",
+      "url": "https://github.com/SonnyHC/bioinfobuddy-site/releases/download/v0.3.1/BioInfoBuddy-0.3.1-Windows-x64-Setup.exe"
     }
   }
 }
