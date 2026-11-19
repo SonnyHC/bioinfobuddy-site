@@ -4,11 +4,13 @@
 
 ## 交付下载
 
-解压交付包，将里面的两个文件按以下路径放在网站上，下载按钮即可使用。
+0.3.1 安装包随交付 ZIP 提供，文件大小和 SHA-256 记录在 `public/downloads/0.3.1/manifest.json`。官网当前下载版本为 0.3.0。
+
+上架 0.3.1 时，解压 ZIP，将两个安装包放到网站的对应路径。核对文件后，用 0.3.1 清单更新 `public/downloads/latest.json`，两个下载按钮便会展示该版本。
 
 ```text
-downloads/0.3.0/BioInfoBuddy-0.3.0-macOS-arm64.dmg
-downloads/0.3.0/BioInfoBuddy-0.3.0-Windows-x64-Setup.exe
+downloads/0.3.1/BioInfoBuddy-0.3.1-macOS-arm64.dmg
+downloads/0.3.1/BioInfoBuddy-0.3.1-Windows-x64-Setup.exe
 ```
 
 如果安装包放在对象存储，请在 `public/downloads/latest.json` 的 `assets.macos.url` 和 `assets.windows.url` 分别填入两个文件的 HTTPS 直链。已经构建好的站点可直接修改 `dist/downloads/latest.json`。
@@ -29,7 +31,7 @@ npm run dev
 ## 导入新版安装包
 
 ```sh
-npm run stage:release -- /path/to/downloads/0.3.0 0.3.0 /path/to/BioInfoBuddy-0.3.0-官网安装包.zip
+npm run stage:release -- /path/to/downloads/0.3.1 0.3.1 /path/to/BioInfoBuddy-0.3.1-官网安装包.zip
 npm run verify:release
 npm run build
 ```
